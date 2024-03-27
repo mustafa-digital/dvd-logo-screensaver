@@ -6,17 +6,85 @@
     <title>DVD Logo Screensaver</title>
   </head>
   <body style="margin: 0; padding: 0; overflow: hidden">
-    <canvas
-      id="canvas"
-      style="height: 100vh; width: 100vw; background: black"
+    <div style="height: 100vh; width: 100vw; background: black">
+        <img style="height: 100px; position: absolute; left: 10px; top: 10px" id="dvd" src="" >
+      </div>
+
     ></canvas>
 
     <script>
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
+      const LEFT = 0;
+      let RIGHT = window.innerWidth;
+      const TOP = 0;
+      let BOTTOM = window.innerHeight;
 
-      ctx.fillStyle = 'green';
-      ctx.fillRect(10, 10, 150, 100);
+      const NUM_COLOURS = 7;
+
+      const normal = {
+        top: {x: 0, y: 1},
+        right: {x: -1, y: 0},
+        bottom: {x:0, y: -1},
+        left: {x: 1, y: 0},
+      };
+
+      const speed = {x: 5, y: 5};
+
+      const dvd = document.getElementById('dvd');
+      let dvdRect = dvd.getBoundingClientRect();
+      let currentColour = Math.floor(Math.random() * NUM_COLOURS) + 1;
+      dvd.src = `assets/dvdlogo-0${currentColour}.svg`;
+
+
+      setInterval(move, 24);
+
+      window.addEventListener('resize', handleWindowResize);
+  
+
+      function move() {
+        dvdRect = dvd.getBoundingClientRect();
+        checkCollision();
+
+        dvd.style.left = `${dvdRect.left + speed.x}px`;
+        dvd.style.top = `${dvdRect.top + speed.y}px`;
+      }
+
+      function checkCollision() {
+        if (dvdRect.top <= TOP) {
+          handleCollision('top');
+        }
+        else if (dvdRect.left <= LEFT) {
+          handleCollision('left');
+        }
+        else if (dvdRect.right >= RIGHT) {
+          handleCollision('right');
+        }
+        else if (dvdRect.bottom >= BOTTOM) {
+          handleCollision('bottom');
+        }
+      }
+
+      function handleCollision(side) {
+        const dot = (speed.x * normal[side].x) + (speed.y * normal[side].y);
+
+        const rX = speed.x - 2*dot*normal[side].x;
+        const rY = speed.y - 2*dot*normal[side].y;
+
+        speed.x = rX;
+        speed.y = rY;
+
+        changeColour();
+      }
+
+      function changeColour() {
+        currentColour = (currentColour ) % 7 + 1;
+        dvd.src = `assets/dvdlogo-0${currentColour}.svg`;
+      }
+
+      function handleWindowResize() {
+        RIGHT = window.innerWidth;
+        BOTTOM = window.innerHeight;
+      }
+
     </script>
   </body>
 </html>
